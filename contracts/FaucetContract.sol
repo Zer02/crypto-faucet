@@ -4,8 +4,30 @@ pragma solidity >=0.4.22 <0.9.0;
 contract Faucet {    
 
     uint public numOfFunders;
+    address public owner;
+
     mapping(address => bool) private funders;
     mapping(uint => address) private lutFunders; // lut = lookup table
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(
+            msg.sender == owner,
+            "Only owner can call this function"
+        );
+        _;
+    }
+
+    modifier limitWithdraw(uint withdrawAmount) {
+        require(
+            withdrawAmount <= 100000000000000000, // 0.1 ETH
+            "Cannot withdraw more than 0.1 ETH"
+        );
+        _;
+    }
 
     receive() external payable {}
 
@@ -17,6 +39,10 @@ contract Faucet {
             funders[funder] = true;
             lutFunders[index] = funder;
         } // prevent duplicates
+    }
+
+    function withdraw(uint withdrawAmount) external limitWithdraw(withdrawAmount) {
+        payable(msg.sender).transfer(withdrawAmount);
     }
 
     function getAllFunders() external view returns(address[] memory) {
@@ -45,6 +71,8 @@ contract Faucet {
 // const instance = await Faucet.deployed()
 // instance.addFunds({value: "1000000000000000000"})
 // instance.addFunds({value: "2000000000000000000", from: accounts[1]})
+
+// instance.withdraw("100000000000000000", {from: accounts[1]})
 
 // instance.getFunderAtIndex(0)
 // instance.getAllFunders()
