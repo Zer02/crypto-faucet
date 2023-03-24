@@ -58,3 +58,7 @@ contract Faucet {
     // mapping(key => value)
 
 }
+
+// with metamask we have access to window.ethereum & window.web3
+// metamask injects a global API into website
+// this API allows websites to request users, accounts, read data to blockchain, sign messages and transactions
